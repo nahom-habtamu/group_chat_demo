@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_group_chat/custom_widgets/auth_button.dart';
+import 'package:flutter_group_chat/custom_widgets/input.dart';
 
-class HomePage extends StatelessWidget {
-  
+class HomePage extends StatefulWidget {
   const HomePage();
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  bool isSignIn = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,53 +46,40 @@ class HomePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+
                     SizedBox(
                       height: 50,
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 50),
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                            hintText: "Enter Your Email",
-                            border: OutlineInputBorder()
-                        ),
-                      ),
+                    Input(
+                        onInputChange: (value){
+                          print(value);
+                        },
+                        hintText: "Enter Your Email"
                     ),
+
                     SizedBox(
                       height: 40,
                     ),
 
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 50),
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                            hintText: "Enter Your Password",
-                            border: OutlineInputBorder()
-                        ),
-                      ),
+                    Input(
+                      onInputChange: (value){
+                        print(value);
+                      },
+                      hintText: "Enter Your Password",
+                      isObsecured: true,
                     ),
 
                     SizedBox(
                       height: 55,
                     ),
 
-                    Container(
-                      width: 200,
-                      height: 50,
-                      color: Colors.blueGrey,
-                      child: Center(
-                        child: Text(
-                          "Sign In",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20
-                          ),
-                        ),
-                      ),
+                    AuthButton(
+                        onPressed: () {
+                          setState(() {
+                            isSignIn = !isSignIn;
+                          });
+                        },
+                        label: isSignIn ? "Sign In" : "Sign Up"
                     ),
 
                     SizedBox(
