@@ -1,6 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_group_chat/custom_widgets/auth_button.dart';
+import 'package:flutter_group_chat/custom_widgets/auth_state_changer.dart';
 import 'package:flutter_group_chat/custom_widgets/input.dart';
+import 'package:flutter_group_chat/custom_widgets/welcome_container.dart';
+import 'package:flutter_group_chat/services/auth.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage();
@@ -11,28 +16,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   bool isSignIn = true;
+  String email = "";
+  String password = "";
+  bool isLoading = false;
+  String error = "";
 
   @override
   Widget build(BuildContext context) {
+
+    var user = Provider.of<User?>(context);
+    var auth = Provider.of<Auth>(context);
+
     return Scaffold(
       backgroundColor: Colors.blueGrey,
       body: Column(
         children: [
-          Container(
-            color: Colors.transparent,
-            width: double.infinity,
-            height: 250,
-            child: Center(
-              child: Text(
-                "Welcome !",
-                style: TextStyle(
-                  fontSize: 55,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.white
-                ),
-              ),
-            ),
-          ),
+          WelcomeContainer(),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -42,58 +41,74 @@ class _HomePageState extends State<HomePage> {
                   topLeft: Radius.circular(50),
                 )
               ),
-              child: Form(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-
-                    SizedBox(
-                      height: 50,
-                    ),
-                    Input(
+              child: SingleChildScrollView(
+                child: Form(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 50,
+                      ),
+                      Input(
+                          onInputChange: (value){
+                            setState(() => email = value);
+                          },
+                          hintText: "Enter Your Email"
+                      ),
+                      SizedBox(
+                        height: 40,
+                      ),
+                      Input(
                         onInputChange: (value){
-                          print(value);
+                          setState(() => password = value);
                         },
-                        hintText: "Enter Your Email"
-                    ),
+                        hintText: "Enter Your Password",
+                        isObsecured: true,
+                      ),
+                      SizedBox(
+                        height: 55,
+                      ),
 
-                    SizedBox(
-                      height: 40,
-                    ),
+                      if(!isLoading)
+                      AuthButton(
+                        onPressed: () async{
+                          setState(() {
+                            isLoading = true;
+                          });
+                          if(isSignIn)
+                            await auth.signInUsers(email, password);
+                          else
+                            await auth.registerUsers(email, password);
 
-                    Input(
-                      onInputChange: (value){
-                        print(value);
-                      },
-                      hintText: "Enter Your Password",
-                      isObsecured: true,
-                    ),
+                          setState(() {
+                            isLoading = false;
+                          });
+                          Navigator.pushNamed(context,"/chatlist");
+                        },
+                        label: isSignIn ? "Sign In" : "Sign Up"
+                      ),
 
-                    SizedBox(
-                      height: 55,
-                    ),
+                      if(isLoading)
+                        CircularProgressIndicator(),
 
-                    AuthButton(
-                        onPressed: () {
+                      SizedBox(
+                        height: 40,
+                      ),
+
+
+                      GestureDetector(
+                        onTap: (){
                           setState(() {
                             isSignIn = !isSignIn;
                           });
                         },
-                        label: isSignIn ? "Sign In" : "Sign Up"
-                    ),
-
-                    SizedBox(
-                      height: 40,
-                    ),
-                    RichText(
-                        text: TextSpan(
-                          children: const <TextSpan> [
-                            TextSpan( text: " Don't Have An Account ? ", style: TextStyle( fontSize: 22, color : Colors.black )),
-                            TextSpan( text: " Sign Up ", style: TextStyle( fontSize: 22 , color: Colors.blueGrey )),
-                          ]
-                        )
-                    )
-                  ],
+                        child: AuthStateChanger(
+                            spanTextOne: isSignIn ? " Don't Have An Account ?" : " Already Have An Account ?",
+                            spanTextTwo: isSignIn ? " Sign Up " : " Sign In "
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             )
