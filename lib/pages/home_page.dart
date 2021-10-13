@@ -1,11 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_group_chat/custom_widgets/auth_button.dart';
 import 'package:flutter_group_chat/custom_widgets/auth_state_changer.dart';
 import 'package:flutter_group_chat/custom_widgets/input.dart';
 import 'package:flutter_group_chat/custom_widgets/welcome_container.dart';
+import 'package:flutter_group_chat/pages/chat_list_page.dart';
 import 'package:flutter_group_chat/services/auth.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage();
@@ -24,9 +26,31 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
 
-    var user = Provider.of<User?>(context);
     var auth = Provider.of<Auth>(context);
+    var user = Provider.of<User?>(context);
 
+    void handleAuth () async {
+      var isSuccessful = false;
+
+      setState(() => isLoading = true );
+      if(isSignIn){
+        var response = await auth.signInUsers(email, password);
+        isSuccessful = response != null;
+      }
+      else {
+        var response = await auth.registerUsers(email, password);
+        isSuccessful = response != null;
+      }
+      setState(() => isLoading = false);
+
+      if(isSuccessful)
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatListPage(),
+            )
+        );
+    }
     return Scaffold(
       backgroundColor: Colors.blueGrey,
       body: Column(
@@ -71,20 +95,7 @@ class _HomePageState extends State<HomePage> {
 
                       if(!isLoading)
                       AuthButton(
-                        onPressed: () async{
-                          setState(() {
-                            isLoading = true;
-                          });
-                          if(isSignIn)
-                            await auth.signInUsers(email, password);
-                          else
-                            await auth.registerUsers(email, password);
-
-                          setState(() {
-                            isLoading = false;
-                          });
-                          Navigator.pushNamed(context,"/chatlist");
-                        },
+                        onPressed: handleAuth,
                         label: isSignIn ? "Sign In" : "Sign Up"
                       ),
 
@@ -94,7 +105,6 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(
                         height: 40,
                       ),
-
 
                       GestureDetector(
                         onTap: (){

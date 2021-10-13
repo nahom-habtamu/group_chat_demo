@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class OtherUserChatBubble extends StatelessWidget {
-  const OtherUserChatBubble();
+
+  final dynamic message;
+  final dynamic time;
+
+  const OtherUserChatBubble({ required this.message, required this.time});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +17,7 @@ class OtherUserChatBubble extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(bottom: 25, left: 100),
             child: Text(
-                "18:05"
+                time.toString()
             ),
           ),
 
@@ -30,7 +34,7 @@ class OtherUserChatBubble extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                "Hey There What's Up",
+                message.toString(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 14,

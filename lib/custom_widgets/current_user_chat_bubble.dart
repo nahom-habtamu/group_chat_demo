@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class CurrentUserChatBubble extends StatelessWidget {
-  const CurrentUserChatBubble();
+
+  final dynamic senderEmail;
+  final dynamic message;
+  final dynamic time;
+
+  const CurrentUserChatBubble({ required this.senderEmail, required this.message, required this.time});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,7 @@ class CurrentUserChatBubble extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                "M",
+                senderEmail[0].toUpperCase(),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 25
@@ -41,7 +46,7 @@ class CurrentUserChatBubble extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                "Hey There What's Up",
+                message.toString(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
@@ -53,7 +58,7 @@ class CurrentUserChatBubble extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(bottom: 25),
             child: Text(
-              "18:05"
+              time.toString()
             ),
           )
         ],

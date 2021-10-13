@@ -19,7 +19,7 @@ class Auth with ChangeNotifier {
 
   Future<UserCredential?> signInUsers (String email, String password) async {
     try {
-      var signedInUser = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      var signedInUser = await _auth.signInWithEmailAndPassword(email: "nahom@gmail.com", password: "123456");
       return signedInUser;
     }
     catch(e){
@@ -29,7 +29,7 @@ class Auth with ChangeNotifier {
 
   Future<UserCredential?> registerUsers (String email, String password) async {
     try {
-      var registeredUser = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      var registeredUser = await _auth.createUserWithEmailAndPassword(email: "nahom@gmail.com", password: "123456");
       return registeredUser;
     }
     catch(e){

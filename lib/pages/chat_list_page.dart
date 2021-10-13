@@ -1,10 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_group_chat/custom_widgets/chat_list_item.dart';
+import 'package:provider/provider.dart';
 
 class ChatListPage extends StatelessWidget {
   const ChatListPage();
 
   @override
   Widget build(BuildContext context) {
+
+    var chatList = Provider.of<List<QueryDocumentSnapshot>>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueGrey[300],
@@ -17,48 +23,14 @@ class ChatListPage extends StatelessWidget {
         children: [
           Container(
             height: 757,
-            child: ListView.builder(
-                itemCount: 5,
+            child: chatList.length == 0 ? CircularProgressIndicator() :
+            ListView.builder(
+                itemCount: chatList.length,
                 itemBuilder: (context,index){
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    child: Card(
-                      elevation: 2,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/chatdetail');
-                        },
-                        splashColor: Colors.blueGrey,
-                        child: ListTile(
-                          title: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: const Text("Chat Name"),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: const Text("i am the last message"),
-                          ),
-                          leading: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.blueGrey,
-                              shape: BoxShape.circle
-                            ),
-                            child: Center(
-                              child: Text(
-                                "M",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 25
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                  return ChatListItem(
+                    chatListIndex: index,
+                    chatName: chatList[index].data()["name"],
+                    lastMessage: chatList[index].data()["messages"][0]["message"],
                   );
                 }
             ),
