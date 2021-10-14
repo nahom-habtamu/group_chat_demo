@@ -14,7 +14,6 @@ class ChatListPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueGrey[300],
-        automaticallyImplyLeading: true,
         centerTitle: true,
         title: Text('Chat List'),
       ),

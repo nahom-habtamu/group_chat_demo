@@ -8,20 +8,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_group_chat/services/chat.dart';
 
 
-class ChatDetailPage extends StatelessWidget {
+class ChatDetailPage extends StatefulWidget {
   ChatDetailPage( this.chatListIndex );
   final int chatListIndex;
 
+  @override
+  _ChatDetailPageState createState() => _ChatDetailPageState();
+}
+
+class _ChatDetailPageState extends State<ChatDetailPage> {
+
+  var message = "";
   @override
   Widget build(BuildContext context) {
 
     var messageList = Provider.of<List<dynamic>>(context);
     var user = Provider.of<User?>(context);
     var chat = Provider.of<Chat>(context);
-
-    print(user!.uid);
-    print(messageList[0]);
-
 
     return Scaffold(
       appBar: AppBar(
@@ -31,43 +34,56 @@ class ChatDetailPage extends StatelessWidget {
         title: Text( "Chat Detail Page"),
       ),
 
-      body: SingleChildScrollView(
+      body: Container(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              margin: EdgeInsets.all(10),
-              height: 680,
-              child:
+            Expanded(
+              child: Container(
+                  margin: EdgeInsets.all(10),
+                  child:
+                  messageList.isEmpty ? CircularProgressIndicator() :
+                  ListView.builder(
+                    itemCount: messageList[widget.chatListIndex].length,
+                    itemBuilder: (context,index){
+                      Timestamp timeStamp = messageList[widget.chatListIndex][index]["createdAt"];
+                      var date = new DateTime.fromMicrosecondsSinceEpoch(timeStamp.microsecondsSinceEpoch);
+                      if( user!.uid == messageList[widget.chatListIndex][index]["senderId"].toString()){
+                        return CurrentUserChatBubble(
+                          time: "${ date.hour}:${date.minute}",
+                          message: messageList[widget.chatListIndex][index]["message"],
+                        );
+                      }
 
-              messageList.isEmpty ? CircularProgressIndicator() :
-
-              ListView.builder(
-                  itemCount: messageList[chatListIndex].length,
-                  itemBuilder: (context,index){
-                    Timestamp timeStamp = messageList[chatListIndex][index]["createdAt"];
-                    var date = new DateTime.fromMicrosecondsSinceEpoch(timeStamp.microsecondsSinceEpoch);
-                    if( user.uid == messageList[chatListIndex][index]["senderId"].toString()){
-                      return OtherUserChatBubble(
-                        time: "${ date.hour}:${date.minute}",
-                        message: messageList[chatListIndex][index]["message"],
-                      );
-                    }
-
-                    else {
-                      return CurrentUserChatBubble(
-                        time: "${ date.hour}:${date.minute}",
-                        message: messageList[chatListIndex][index]["message"],
-                        senderEmail: messageList[chatListIndex][index]["senderEmail"],
-                      );
-                    }
-                  },
-              )
+                      else {
+                        return OtherUserChatBubble(
+                          time: "${ date.hour}:${date.minute}",
+                          message: messageList[widget.chatListIndex][index]["message"],
+                          senderEmail: messageList[widget.chatListIndex][index]["senderEmail"],
+                        );
+                      }
+                    },
+                  )
+              ),
             ),
-            SendMessageWidget(
-              onInputChanged: () {},
-              onMessageSendClicked: () {
-                chat.addMessage(chatListIndex, "ME", user.uid, user.email.toString());
-              },
+            SingleChildScrollView(
+              child: SendMessageWidget(
+                value: message,
+                onInputChanged: (value) {
+                  setState(() {
+                    message = value;
+                  });
+                },
+                onMessageSendClicked: () {
+                  if(message.length > 0){
+                    var tempMessage = message;
+                    setState(() {
+                      message = "";
+                    });
+                    chat.addMessage(widget.chatListIndex, tempMessage , user!.uid, user.email.toString());
+                  }
+                },
+              ),
             ),
           ],
         ),

@@ -15,8 +15,6 @@ class Chat with ChangeNotifier {
     return _groupChat.snapshots().map((element) => element.docs).map((snaps) => snaps.map((e) => e.data()["messages"]).toList());
   }
 
-
-  // void addMessage(String senderId, String senderEmail, String message, String docId) async {
   void addMessage(int chatListIndex, String message, String senderId, String senderEmail ) async {
 
     try {
@@ -24,27 +22,19 @@ class Chat with ChangeNotifier {
        QuerySnapshot allData = await _groupChat.get();
        Map<String,dynamic> currentChat = allData.docs[chatListIndex].data();
 
-       var dataToSet = Map<String,dynamic>();
-       dataToSet["createdBy"] = currentChat["createdBy"];
-       dataToSet["name"] = currentChat["name"];
-       dataToSet["createdAt"] = currentChat["createdAt"];
-
-
        var messageToAdd = Map<String,dynamic>();
        messageToAdd["createdAt"] = Timestamp.fromDate(DateTime.now());
        messageToAdd["message"] = message;
        messageToAdd["senderId"] = senderId;
        messageToAdd["senderEmail"] = senderEmail;
 
-
-       dataToSet["messages"] = {
-         ...currentChat["messages"],
-         messageToAdd
-       };
-
-       print(allData.docs[chatListIndex].id);
-
-       _groupChat.doc(allData.docs[chatListIndex].id).set(dataToSet);
+       await _groupChat.doc(allData.docs[chatListIndex].id).set({
+         ...currentChat,
+         "messages" : [
+           ...currentChat["messages"],
+           messageToAdd
+         ]
+       });
 
     }
     catch(e){
